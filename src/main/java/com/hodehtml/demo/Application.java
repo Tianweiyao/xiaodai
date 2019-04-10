@@ -15,7 +15,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 @SpringBootApplication
 @MapperScan("com.hodehtml.demo.dao")
-@RequestMapping
 public class Application extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {

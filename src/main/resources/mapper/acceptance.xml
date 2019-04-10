@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hodehtml.demo.dao.AcceptanceDao">
+
+    <!--resultMap对应的是表与实体类的映射  - type 数据库表对应的实体类，别名或完整类名都可以-->
+    <resultMap id="BaseResultMap" type="com.hodehtml.demo.model.Acceptance" >
+        <!-- 结果集的主键 -->
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <!-- 普通的列  -column 是数据库中字段， property是实体类中字段-->
+        <result column="construction_id" property="constructionId" jdbcType="INTEGER" />
+        <result column="construction_day" property="constructionDay" jdbcType="INTEGER" />
+        <result column="completion_date" property="completionDate" jdbcType="TIMESTAMP" />
+        <result column="acceptance_specification" property="acceptanceSpecification" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <resultMap id="ApprovalResultMap" type="com.hodehtml.demo.model.vo.ApprovalAcceptance">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <!-- 普通的列  -column 是数据库中字段， property是实体类中字段-->
+        <result column="approval_id" property="approvalId" jdbcType="INTEGER" />
+        <result column="acceptance_id" property="acceptanceId" jdbcType="INTEGER" />
+    </resultMap>
+
+    <resultMap id="ImageResultMap" type="com.hodehtml.demo.model.vo.ApprovalImage">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="approval_id" property="approvalId" jdbcType="INTEGER" />
+        <result column="image" property="image" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="INTEGER" />
+    </resultMap>
+
+    <resultMap id="MessageResultMap" type="com.hodehtml.demo.model.Message">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="approval_detial_id" property="approvalDetialId" jdbcType="INTEGER" />
+        <result column="title" property="title" jdbcType="VARCHAR" />
+        <result column="user_id" property="userId" jdbcType="INTEGER" />
+        <result column="time" property="time" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <resultMap id="FaBuResultMap" type="com.hodehtml.demo.model.FaBu">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="acceptance_id" property="acceptanceId" jdbcType="INTEGER" />
+        <result column="title" property="title" jdbcType="VARCHAR" />
+        <result column="deptment" property="deptment" jdbcType="VARCHAR" />
+        <result column="result" property="result" jdbcType="VARCHAR" />
+        <result column="time" property="time" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <insert id="insertAcceptance" useGeneratedKeys="true" keyProperty="id" parameterType="com.hodehtml.demo.model.Acceptance">
+       INSERT INTO acceptance(construction_id,construction_day,completion_date,acceptance_specification)
+               VALUES (#{constructionId,jdbcType=INTEGER},#{constructionDay,jdbcType=INTEGER},#{completionDate,jdbcType=TIMESTAMP},
+                       #{acceptanceSpecification,jdbcType=VARCHAR});
+    </insert>
+
+    <insert id="insetApprovalAcceptance">
+        INSERT INTO approval_acceptance(approval_id,acceptance_id)
+        VALUES (#{approvalId,jdbcType=INTEGER},#{acceptanceId,jdbcType=INTEGER});
+    </insert>
+
+    <insert id="insertFaBu" useGeneratedKeys="true" keyProperty="id" parameterType="com.hodehtml.demo.model.FaBu">
+       INSERT INTO public(acceptance_id,title,deptment,result,time) VALUES
+           (#{acceptanceId,jdbcType=INTEGER},#{title,jdbcType=VARCHAR},#{deptment,jdbcType=VARCHAR},#{result,jdbcType=VARCHAR},#{time,jdbcType=TIMESTAMP})
+    </insert>
+
+    <select id="selectFaBu" resultMap="FaBuResultMap">
+       SELECT id,acceptance_id,title,deptment,result,time FROM public order by time desc limit #{pageNo,jdbcType=VARCHAR},#{pageSize,jdbcType=VARCHAR};
+    </select>
+
+    <select id="selectFaBuCount" resultType="java.lang.Integer">
+        SELECT count(*) FROM public;
+    </select>
+
+    <select id="selectAcceptance" resultMap="BaseResultMap">
+       select id, construction_id,construction_day,completion_date,acceptance_specification FROM acceptance where id = #{acceptanceId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectAcceptance1" resultMap="ApprovalResultMap">
+         select approval_id,acceptance_id FROM approval_acceptance where approval_id = #{acceptanceId,jdbcType=INTEGER} order by id desc;
+    </select>
+
+    <select id="selectAcceptance2" resultMap="ApprovalResultMap">
+        select approval_id,acceptance_id FROM approval_acceptance where acceptance_id = #{acceptanceId,jdbcType=INTEGER} order by id desc;
+    </select>
+
+    <select id="imageList" resultMap="ImageResultMap">
+        select approval_id,image,type FROM approval_image WHERE approval_id = #{acceptanceId,jdbcType=INTEGER} and type = #{type,jdbcType=INTEGER};
+    </select>
+
+    <insert id="insertMessage">
+       insert into message(approval_detial_id,title,user_id,time) VALUES (#{approvalDetialId,jdbcType=INTEGER},#{title,jdbcType=VARCHAR},#{userId,jdbcType=INTEGER},#{time,jdbcType=TIMESTAMP})
+    </insert>
+
+    <select id="messageList" resultMap="MessageResultMap">
+        select approval_detial_id,title,user_id,time FROM message WHERE user_id = #{userId,jdbcType=INTEGER} order by time desc limit #{pageNo,jdbcType=VARCHAR},#{pageSize,jdbcType=VARCHAR};
+    </select>
+
+    <select id="messageCount" resultType="java.lang.Integer">
+        select count(*) FROM message WHERE user_id = #{userId,jdbcType=INTEGER};
+    </select>
+
+</mapper>

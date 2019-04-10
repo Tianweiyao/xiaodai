@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hodehtml.demo.dao.ApprovalDao">
+
+    <!--resultMap对应的是表与实体类的映射  - type 数据库表对应的实体类，别名或完整类名都可以-->
+    <resultMap id="BaseResultMap" type="com.hodehtml.demo.model.Approval" >
+        <!-- 结果集的主键 -->
+        <id column="approval_id" property="approvalId" jdbcType="INTEGER" />
+        <!-- 普通的列  -column 是数据库中字段， property是实体类中字段-->
+        <result column="title" property="title" jdbcType="VARCHAR" />
+        <result column="title_type" property="titleType" jdbcType="INTEGER" />
+        <result column="city" property="city" jdbcType="VARCHAR" />
+        <result column="classify" property="classify" jdbcType="VARCHAR" />
+        <result column="detailed_address" property="detailedAddress" jdbcType="VARCHAR" />
+        <result column="equipment_type" property="equipmentType" jdbcType="INTEGER" />
+        <result column="peripheral_condition" property="peripheralCondition" jdbcType="VARCHAR" />
+        <result column="construction_period" property="constructionPeriod" jdbcType="INTEGER" />
+        <result column="budget_quotation" property="budgetQuotation" jdbcType="DOUBLE" />
+        <result column="describes" property="describe" jdbcType="VARCHAR" />
+        <result column="user_id" property="userId" jdbcType="INTEGER" />
+    </resultMap>
+
+    <resultMap id="ApprovalResultMap" type="com.hodehtml.demo.model.ApprovalDetial">
+        <!-- 结果集的主键 -->
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <!-- 普通的列  -column 是数据库中字段， property是实体类中字段-->
+        <result column="title" property="title" jdbcType="VARCHAR" />
+        <result column="approval_progress" property="approvalProgress" jdbcType="INTEGER" />
+        <result column="time" property="time" jdbcType="TIMESTAMP" />
+        <result column="approval_id" property="approvalId" jdbcType="INTEGER" />
+        <result column="approval_suggestion" property="approvalSuggestion" jdbcType="VARCHAR" />
+        <result column="user_id" property="userId" jdbcType="INTEGER" />
+        <result column="user_name" property="userName" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="INTEGER" />
+        <result column="submit_id" property="submitId" jdbcType="INTEGER" />
+        <result column="status" property="status" jdbcType="INTEGER" />
+        <result column="approval_ids" property="approvalIds" jdbcType="INTEGER" />
+    </resultMap>
+
+    <resultMap id="ImageResultMap" type="com.hodehtml.demo.model.vo.ApprovalImage">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="approval_id" property="approvalId" jdbcType="INTEGER" />
+        <result column="image" property="image" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="INTEGER" />
+    </resultMap>
+
+    <resultMap id="UserResultMap" type="com.hodehtml.demo.model.UserApproval">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="approval_id" property="approvalId" jdbcType="INTEGER" />
+        <result column="user_id" property="userId" jdbcType="INTEGER" />
+        <result column="type" property="type" jdbcType="INTEGER" />
+    </resultMap>
+
+    <insert id="insertApproval" useGeneratedKeys="true" keyProperty="approvalId" parameterType="com.hodehtml.demo.model.Approval" >
+      INSERT INTO approval(title,title_type,city,classify,detailed_address,equipment_type,peripheral_condition,construction_period,budget_quotation,describes,user_id)
+      VALUES (#{title,jdbcType=VARCHAR},#{titleType,jdbcType=INTEGER},#{city,jdbcType=VARCHAR},#{classify,jdbcType=VARCHAR},#{detailedAddress,jdbcType=VARCHAR}
+      ,#{equipmentType,jdbcType=INTEGER},#{peripheralCondition,jdbcType=VARCHAR},#{constructionPeriod,jdbcType=VARCHAR},#{budgetQuotation,jdbcType=DOUBLE},#{describe,jdbcType=VARCHAR},#{userId,jdbcType=INTEGER});
+    </insert>
+
+    <insert id="insertApprovalDetial" parameterType="com.hodehtml.demo.model.ApprovalDetial">
+        INSERT INTO approval_detial(title,approval_progress,time,approval_id,approval_suggestion,user_id,user_name,type,submit_id,status,approval_ids)
+        VALUES (#{title,jdbcType=VARCHAR},#{approvalProgress,jdbcType=INTEGER},#{time,jdbcType=TIMESTAMP},#{approvalId,jdbcType=INTEGER},#{approvalSuggestion,jdbcType=VARCHAR}
+            ,#{userId,jdbcType=INTEGER},#{userName,jdbcType=VARCHAR},#{type,jdbcType=INTEGER},#{submitId,jdbcType=INTEGER},#{status,jdbcType=INTEGER},#{approvalIds,jdbcType=INTEGER});
+    </insert>
+
+    <insert id="insertApprovalImage">
+        INSERT INTO approval_image(approval_id,image,type)
+        VALUES
+        <foreach collection="list" item="recode" separator="," index="index" >
+            (#{recode.approvalId},#{recode.image},#{recode.type})
+        </foreach>
+    </insert>
+
+    <update id="updateImage">
+        UPDATE approval_image SET type = 0 where approval_id = #{approvalId,jdbcType=INTEGER};
+    </update>
+
+    <select id="selectId" resultMap="UserResultMap">
+      SELECT approval_id,user_id,type FROM user_approval WHERE approval_id = #{userId,jdbcType=INTEGER} AND type = #{type,jdbcType=INTEGER}
+    </select>
+
+    <insert id="insertUser">
+         INSERT INTO user_approval(approval_id,user_id,type) VALUES (#{approvalId,jdbcType=INTEGER},#{userId,jdbcType=INTEGER},#{type,jdbcType=INTEGER});
+    </insert>
+
+    <select id="selectApprovalDetial" resultMap="ApprovalResultMap">
+       select id, title,approval_progress,time,approval_id,approval_suggestion,user_id,user_name,submit_id,type FROM approval_detial where submit_id = #{userId,jdbcType=INTEGER} AND user_id != #{userId,jdbcType=INTEGER}  and status = #{status,jdbcType=INTEGER} order by time desc;
+    </select>
+
+    <select id="selectApprovalDetialss" resultMap="ApprovalResultMap">
+        select id, title,type As approval_progress,approval_progress as type,time,approval_id,approval_suggestion,user_id,user_name,submit_id,type FROM approval_detial where user_id = #{userId,jdbcType=INTEGER} and approval_progress = 0 order by time desc;
+    </select>
+
+    <select id="selectApprovalDetial1" resultMap="ApprovalResultMap">
+        select id, title,approval_progress,time,approval_id,approval_suggestion,user_id,user_name,submit_id,type FROM approval_detial where user_id = #{userId,jdbcType=INTEGER} and status = #{status,jdbcType=INTEGER} order by time desc;
+    </select>
+
+    <select id="selectApprovalDetial2" resultMap="ApprovalResultMap">
+        select id, title,approval_progress,time,approval_id,approval_suggestion,user_id,user_name,submit_id,type FROM approval_detial where user_id = #{userId,jdbcType=INTEGER} and status = #{status,jdbcType=INTEGER} order by time desc;
+    </select>
+
+    <select id="selectUserApproval" resultMap="UserResultMap">
+        select approval_id,user_id,type FROM user_approval where approval_id = #{userId,jdbcType=INTEGER} GROUP BY type;
+    </select>
+
+    <select id="approvalSucess" resultType="java.lang.Integer">
+        SELECT  count(*) from approval_detial WHERE submit_id = #{userId,jdbcType=INTEGER} AND user_id != #{userId,jdbcType=INTEGER} and approval_progress = 2 and status = 1;
+    </select>
+
+    <select id="approvalFail" resultType="java.lang.Integer">
+        SELECT  count(*) from approval_detial WHERE submit_id = #{userId,jdbcType=INTEGER} AND user_id != #{userId,jdbcType=INTEGER} and approval_progress = 3 and status = 1;
+    </select>
+
+    <select id="acceptancePass" resultType="java.lang.Integer">
+        SELECT  count(*) from approval_detial WHERE submit_id = #{userId,jdbcType=INTEGER} AND user_id != #{userId,jdbcType=INTEGER} and approval_progress = 4 and status = 2;
+    </select>
+
+    <select id="acceptanceFail" resultType="java.lang.Integer">
+        SELECT  count(*) from approval_detial WHERE submit_id = #{userId,jdbcType=INTEGER} AND user_id != #{userId,jdbcType=INTEGER} and approval_progress = 5 and status = 2;
+    </select>
+
+    <select id="selectApproval" resultMap="BaseResultMap">
+         SELECT approval_id,title,title_type,city,classify,detailed_address,equipment_type,peripheral_condition,construction_period,budget_quotation,describes,user_id from approval where approval_id = #{approvalId,jdbcType=INTEGER} order by time desc;
+    </select>
+
+    <select id="selectApprovalDetials" resultMap="ApprovalResultMap">
+        SELECT id,status,approval_id,title,approval_progress,time,submit_id,approval_suggestion,user_id,user_name,type,approval_ids from approval_detial where approval_ids = #{approvalId,jdbcType=INTEGER};
+    </select>
+
+    <select id="selectApprova" resultType="java.lang.Integer">
+        SELECT id from approval_detial where approval_ids = #{approvalId,jdbcType=INTEGER} AND approval_progress = 0 and status != 0;
+    </select>
+
+    <select id="selectType" resultMap="ApprovalResultMap">
+        SELECT id,status,approval_id,title,approval_progress,time,submit_id,approval_suggestion,user_id,user_name,type,approval_ids from approval_detial where approval_id = #{approvalId,jdbcType=INTEGER} and approval_progress = #{approvalProgress,jdbcType=INTEGER} order by time desc
+    </select>
+
+    <select id="selectTypes" resultMap="ApprovalResultMap">
+        SELECT id,status,approval_id,title,approval_progress,time,submit_id,approval_suggestion,user_id,user_name,type,approval_ids from approval_detial where approval_id = #{approvalId,jdbcType=INTEGER} and approval_progress = 3 or approval_progress = 5 order by time desc;
+    </select>
+
+    <select id="selectApprovalDetiales" resultMap="ApprovalResultMap">
+        SELECT id,status,approval_id,title,approval_progress,time,submit_id,approval_suggestion,user_id,user_name,type,approval_ids from approval_detial where approval_id = #{approvalId,jdbcType=INTEGER} order by time desc
+    </select>
+
+    <select id="selectApprovalDetialAll" resultMap="ApprovalResultMap">
+        SELECT id, title,approval_progress,time,submit_id,approval_suggestion,user_id,user_name,approval_id,type from approval_detial where user_id = #{userId,jdbcType=INTEGER} and approval_progress = 1 and status = #{status,jdbcType=INTEGER}
+        <if test="title != '' and title != null">
+            and title = #{title,jdbcType=VARCHAR};
+        </if>
+        order by time desc
+    </select>
+
+    <select id="selectDetial" resultMap="ApprovalResultMap">
+        SELECT id, title,approval_progress,time,submit_id,approval_suggestion,user_id,user_name,approval_id,type from approval_detial where approval_id = #{approvalId,jdbcType=INTEGER} and user_id = #{userId,jdbcType=INTEGER} and status = #{status,jdbcType=INTEGER} order by time desc;
+    </select>
+
+    <update id="updateApprovalDetial">
+        UPDATE approval_detial SET approval_progress = #{approvalProgress,jdbcType=INTEGER},approval_suggestion = #{approvalSuggestion,jdbcType=VARCHAR},time = #{time,jdbcType=TIMESTAMP},status = #{status,jdbcType=INTEGER} WHERE id = #{id,jdbcType=INTEGER} and status != 0;
+    </update>
+
+    <update id="updateApprovalUser">
+        UPDATE approval_detial SET type = #{approvalProgress,jdbcType=INTEGER},approval_suggestion = #{approvalSuggestion,jdbcType=VARCHAR},time = #{time,jdbcType=TIMESTAMP} WHERE user_id = #{submitId,jdbcType=INTEGER} and approval_id = #{approvalId,jdbcType=INTEGER} and status != 0;
+    </update>
+
+    <select id="selectApprovalUser" resultMap="ApprovalResultMap">
+        SELECT * FROM approval_detial WHERE user_id = #{submitId,jdbcType=INTEGER} and approval_id = #{approvalId,jdbcType=INTEGER} order by time desc
+    </select>
+
+    <select id="selectApprovalUsers" resultMap="ApprovalResultMap">
+        SELECT * FROM approval_detial WHERE id = #{id,jdbcType=INTEGER} order by time desc
+    </select>
+
+    <update id="updateApprovalUsers">
+        UPDATE approval_detial SET type = #{approvalProgress,jdbcType=INTEGER},approval_suggestion = #{approvalSuggestion,jdbcType=VARCHAR},time = #{time,jdbcType=TIMESTAMP},status = #{status,jdbcType=INTEGER} WHERE user_id = #{submitId,jdbcType=INTEGER} and approval_id = #{approvalId,jdbcType=INTEGER} and status != 0;
+    </update>
+
+    <update id="updateApprovalUseres">
+        UPDATE approval_detial SET type = #{approvalProgress,jdbcType=INTEGER},approval_suggestion = #{approvalSuggestion,jdbcType=VARCHAR},time = #{time,jdbcType=TIMESTAMP},status = #{status,jdbcType=INTEGER} WHERE id = #{id,jdbcType=INTEGER} and status != 0;
+    </update>
+
+    <delete id="deleteApprovalDetial">
+        DELETE FROM approval_detial WHERE submit_id = #{submitId,jdbcType=INTEGER} and approval_id = #{approvalId,jdbcType=INTEGER}
+    </delete>
+
+    <delete id="deleteModel">
+        DELETE FROM approval_detial WHERE id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <update id="updateApproval">
+        UPDATE approval SET title = #{title,jdbcType=VARCHAR},title_type = #{titleType,jdbcType=INTEGER},city = #{city,jdbcType=VARCHAR},classify = #{classify,jdbcType=VARCHAR},detailed_address = #{detailedAddress,jdbcType=VARCHAR},equipment_type = #{equipmentType,jdbcType=INTEGER},peripheral_condition = #{peripheralCondition,jdbcType=VARCHAR},
+            construction_period = #{constructionPeriod,jdbcType=VARCHAR},budget_quotation = #{budgetQuotation,jdbcType=DOUBLE},describes = #{describe,jdbcType=VARCHAR} WHERE approval_id = #{approvalId,jdbcType=INTEGER};
+    </update>
+
+    <select id="LieBiao" resultMap="ApprovalResultMap">
+        SELECT id,title,approval_progress,approval_id,type,time,submit_id,approval_suggestion,user_id,user_name from approval_detial
+        <where>
+            user_id = #{userId,jdbcType=INTEGER} and status != 0
+            <if test="status != '' and status != null">
+              and approval_progress = #{status,jdbcType=INTEGER}
+            </if>
+            <if test="startTime != null and endTime != null">
+              and time between DATE_FORMAT(#{startTime,jdbcType=TIMESTAMP},'%Y-%m-%d %H:%i:%s') and DATE_FORMAT(#{endTime,jdbcType=TIMESTAMP},'%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="title != '' and title != null">
+              and title = #{title,jdbcType=VARCHAR}
+            </if>
+            order by time desc limit #{pageNo,jdbcType=VARCHAR},#{pageSize,jdbcType=VARCHAR}
+        </where>
+    </select>
+
+    <select id="LieBiaoCount" resultType="java.lang.Integer">
+        SELECT count(*) from approval_detial
+        <where>
+            user_id = #{userId,jdbcType=INTEGER} and status != 0
+            <if test="status != '' and status != null">
+                and approval_progress = #{status,jdbcType=INTEGER}
+            </if>
+            <if test="startTime != null and endTime != null">
+                and time between DATE_FORMAT(#{startTime,jdbcType=TIMESTAMP},'%Y-%m-%d %H:%i:%s') and DATE_FORMAT(#{endTime,jdbcType=TIMESTAMP},'%Y-%m-%d %H:%i:%s')
+            </if>
+            <if test="title != '' and title != null">
+                and title = #{title,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+</mapper>

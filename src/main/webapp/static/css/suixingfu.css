@@ -1,0 +1,73 @@
+*{
+	margin: 0px;
+	padding: 0px;
+}
+.zhifu{
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	bottom: 0px;
+	right: 0px;
+	margin: auto;
+	width: 600px;
+	height: 345px;
+	/*border: 1px solid #1196db;*/
+	box-shadow: 0px 0px  10px #ccc;
+	border-radius: 5px;
+}
+.titile-top{
+	text-align: center;
+	margin-top: 60px;
+}
+.titile-top a{
+	color: #1196db;
+	text-decoration: none;
+	
+}
+.titile-top a:hover{
+	text-decoration: underline;
+}
+.con{
+	padding-top: 15px;
+	margin: 0px 97px;
+	text-align: center;
+}
+.con p{
+	margin-top: 15px;
+}
+.con p span{
+	 display: inline-block; 
+	 width: 80px;
+	vertical-align:middle;
+	text-align: left;
+	font-size: 14px;
+}
+.con p input{
+	width: 170px;
+	height: 26px;
+	border-radius: 3px;
+	border: 1px solid #347eb7;
+}
+.con p  a{
+	text-align: left;
+	text-decoration: none;
+	color: #4988bc;
+	font-size: 14px;
+
+}
+.con p  a:hover{
+	text-decoration: underline;
+	
+}
+.con p button{
+	width: 100px;
+	height: 37px;
+	background-color: #1196DB;
+	border: none;
+	color: #fff;
+	border-radius: 3px;
+	
+}
+.con p button:hover{
+	background-color: #3dace6;
+}

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hodehtml.demo.dao.LoginDao">
+
+    <!--resultMap对应的是表与实体类的映射  - type 数据库表对应的实体类，别名或完整类名都可以-->
+    <resultMap id="BaseResultMap" type="com.hodehtml.demo.model.Login" >
+        <!-- 结果集的主键 -->
+        <id column="user_id" property="userId" jdbcType="INTEGER" />
+        <!-- 普通的列  -column 是数据库中字段， property是实体类中字段-->
+        <result column="user_name" property="userName" jdbcType="VARCHAR" />
+        <result column="user_phone" property="userPhone" jdbcType="VARCHAR" />
+        <result column="password" property="password" jdbcType="VARCHAR" />
+        <result column="token" property="token" jdbcType="VARCHAR" />
+        <result column="image" property="image" jdbcType="VARCHAR" />
+        <result column="department" property="department" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="INTEGER" />
+    </resultMap>
+
+    <insert id="Register" parameterType="com.hodehtml.demo.model.Login">
+        INSERT INTO user(user_name,user_phone,password,token,image,department,type) VALUES (#{userName,jdbcType=VARCHAR},#{userPhone,jdbcType=VARCHAR},#{password,jdbcType=VARCHAR},#{token,jdbcType=VARCHAR},#{image,jdbcType=VARCHAR},#{department,jdbcType=VARCHAR},#{type,jdbcType=INTEGER});
+    </insert>
+
+    <select id="isTrue" resultMap="BaseResultMap">
+        select user_id, user_name,user_phone,password,token,image,department,type FROM user WHERE user_phone = #{userPhone,jdbcType=VARCHAR};
+    </select>
+
+    <select id="list" resultMap="BaseResultMap">
+        select user_id, user_name,user_phone,password,token,image,department,type FROM user WHERE user_phone = #{userPhone,jdbcType=VARCHAR} and password = #{password,jdbcType=VARCHAR};
+    </select>
+
+    <select id="selectLogin" resultMap="BaseResultMap">
+        select user_id, user_name,user_phone,password,token,image,department,type FROM user WHERE user_id = #{userId,jdbcType=INTEGER};
+    </select>
+
+</mapper>
